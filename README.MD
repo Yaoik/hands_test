@@ -16,7 +16,7 @@ docker-compose exec django ./manage.py migrate
 ```bash
 docker-compose exec django ./manage.py createsuperuser
 ```
-5. Cоздайте администратора
+5. Выполните тесты
 ```bash
 docker-compose exec django pytest
 ```
