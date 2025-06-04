@@ -1,11 +1,16 @@
-import uuid
-
 from rest_framework import serializers
+
+from organizations.models import Organization
 
 from .models import Payment
 
 
 class PaymentSerializer(serializers.ModelSerializer):
+    payer_inn = serializers.PrimaryKeyRelatedField(
+        queryset=Organization.objects.all(),
+        pk_field=serializers.CharField()
+    )
+
     class Meta:
         model = Payment
         fields = (

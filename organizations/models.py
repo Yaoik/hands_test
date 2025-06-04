@@ -8,7 +8,6 @@ class Organization(Timestamped):
         max_length=12,
         verbose_name='ИНН организации',
         primary_key=True,
-        editable=False,
     )
     balance = models.PositiveIntegerField(
         verbose_name='Баланс'

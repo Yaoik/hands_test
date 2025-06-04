@@ -36,7 +36,7 @@ class CreatePaymentView(GenericAPIView, mixins.CreateModelMixin):
             serializer.is_valid(raise_exception=True)
 
             organization = Organization.objects.select_for_update().get(
-                inn=serializer.validated_data['payer_inn']
+                inn=request.data['payer_inn']
             )
 
             result_serializer = self.perform_create(serializer, organization)

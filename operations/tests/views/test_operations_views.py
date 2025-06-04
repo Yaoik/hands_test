@@ -51,7 +51,7 @@ class TestCreatePaymentView:
         payment = Payment.objects.get(operation_id=payment_data["operation_id"])
         organization.refresh_from_db()
         assert payment.amount == 1000
-        assert payment.payer_inn == organization.inn
+        assert payment.payer_inn.inn == organization.inn
 
         payment_log = PaymentLogs.objects.get(payment=payment)
         assert payment_log.organization == organization
@@ -63,7 +63,7 @@ class TestCreatePaymentView:
     def test_create_payment_duplicate_operation_id(
         self, api_client: APIClient, organization: Organization
     ) -> None:
-        payment = PaymentFactory(payer_inn=organization.inn)
+        payment = PaymentFactory(payer_inn=organization)
         payment_data = {
             "operation_id": str(payment.operation_id),
             "amount": 1000,
@@ -73,9 +73,7 @@ class TestCreatePaymentView:
         }
         url = reverse("payment:create-payment-webhook")
         response = cast(Response, api_client.post(url, payment_data, format="json"))
-        logger.info(f'{payment_data=}')
-        logger.info(f'{response=}')
-        logger.info(f'{response.data=}')
+
         assert response.status_code == status.HTTP_200_OK
         assert response.data["operation_id"] == str(payment.operation_id)  # type: ignore
         assert Payment.objects.filter(operation_id=payment.operation_id).count() == 1
@@ -93,9 +91,9 @@ class TestCreatePaymentView:
         }
         url = reverse("payment:create-payment-webhook")
         response = cast(Response, api_client.post(url, payment_data, format="json"))
-
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert "Organization not found" in str(response.data)
+        logger.info(f'{response.data=}')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "object does not exist" in str(response.data)
         assert not Payment.objects.filter(operation_id=payment_data["operation_id"]).exists()
 
     def test_create_payment_invalid_operation_id(

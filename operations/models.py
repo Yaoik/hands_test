@@ -11,8 +11,9 @@ class Payment(Timestamped):
     amount = models.PositiveIntegerField(
         verbose_name='Сумма'
     )
-    payer_inn = models.CharField(
-        max_length=12,
+    payer_inn = models.ForeignKey(
+        'organizations.Organization',
+        on_delete=models.PROTECT,
         verbose_name='ИНН плательщика'
     )
     document_number = models.CharField(
